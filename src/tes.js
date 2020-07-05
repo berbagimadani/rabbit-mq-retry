@@ -1,57 +1,33 @@
-const storage = 
-[
-	{
-	  count: 5,
-	  exchange: 'logs_with_ack_retry',
-	  queue: 'logs_with_ack_queue',
-	  reason: 'expired',
-	  'routing-keys': [ '' ],
-	  time: { '!': 'timestamp', value: 1592629763 }
-	},
-	{
-	  count: 5,
-	  exchange: 'logs_with_ack',
-	  queue: 'logs_with_ack_created',
-	  reason: 'rejected',
-	  'routing-keys': [ '' ],
-	  time: { '!': 'timestamp', value: 1592629758 }
-	}
-  ]
-  [
-	{
-	  count: 4,
-	  exchange: 'logs_with_ack_retry',
-	  queue: 'logs_with_ack_queue',
-	  reason: 'expired',
-	  'routing-keys': [ '' ],
-	  time: { '!': 'timestamp', value: 1592629795 }
-	},
-	{
-	  count: 4,
-	  exchange: 'logs_with_ack',
-	  queue: 'logs_with_ack_created',
-	  reason: 'rejected',
-	  'routing-keys': [ '' ],
-	  time: { '!': 'timestamp', value: 1592629790 }
-	}
-  ]
-  [
-	{
-	  count: 4,
-	  exchange: 'logs_with_ack_retry',
-	  queue: 'logs_with_ack_queue',
-	  reason: 'expired',
-	  'routing-keys': [ '' ],
-	  time: { '!': 'timestamp', value: 1592629795 }
-	},
-	{
-	  count: 4,
-	  exchange: 'logs_with_ack',
-	  queue: 'logs_with_ack_created',
-	  reason: 'rejected',
-	  'routing-keys': [ '' ],
-	  time: { '!': 'timestamp', value: 1592629790 }
-	}
-  ]
+#!/usr/bin/env node
 
-console.log( storage.length );
+var amqp = require('amqplib/callback_api');
+amqp.connect('amqp://localhost', function(error0, connection) {
+    if (error0) {
+        throw error0;
+    }
+    connection.createChannel(function(error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+        var exchange = 'payments_created3';
+        channel.assertExchange(exchange, 'fanout', {
+            durable: false
+        });
+        channel.assertQueue(exchange, {
+          durable: true,
+          persistent: true
+        });
+        channel.consume(exchange, function(msg) { 
+          var secs = msg.content.toString().split('.').length - 1;
+          console.log(" [x] Received %s", msg.content.toString());
+          setTimeout(function() {
+              // update DB (msg)
+              console.log(" [x] Done");
+              channel.ack(msg);
+          }, secs * 1000);
+
+        }, {
+            noAck: false
+        });        
+    });
+});
