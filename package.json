@@ -6,7 +6,7 @@
     "amqplib": "latest",
     "axios": "^0.19.2",
     "js-beautify": "^1.9.1",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.7",
     "nodemailer": "^6.4.10",
     "rpc-amqp": "^0.2.20",
     "uuid": "^8.2.0",
